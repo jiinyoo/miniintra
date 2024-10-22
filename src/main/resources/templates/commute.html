@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+  <style>
+    section {
+      width:1000px;
+      height:600px;
+      margin:auto;
+    }
+    section div {
+      margin-top:30px;
+      text-align:center;
+    }
+  </style>
+  <script>
+    function toWork()
+    {
+    	var chk=new XMLHttpRequest();
+    	chk.onload=function()
+    	{
+    		//alert(chk.responseText);
+    		var cvo=JSON.parse(chk.responseText);
+    		
+    		var state="";
+    		if(cvo.state==1)
+    		   	state="정상 출근 후 근무하고 계십니다";
+    		else if(cvo.state==2)
+    			    state="지각 후 근무하고 계십니다";
+    		
+    		document.getElementById("toWork").innerText=cvo.toWork+" ("+state+")";
+  
+    		// 출근하기를 클릭했으므로 
+    		// 출근하기는 비활성화 , 퇴근하기는 활성화
+    		document.getElementById("w").disabled=true;
+    		document.getElementById("h").disabled=false;
+    	}
+    	chk.open("get","toWork");
+    	chk.send();
+    }
+    
+    function toHome()
+    {
+    	let chk=new XMLHttpRequest();
+    	chk.onload=function()
+    	{
+    		//alert(chk.responseText);
+    		var cvo=JSON.parse(chk.responseText);
+    		
+    		var state="";
+    		if(cvo.state==3)
+    		   	state="정상출근";
+    		else if(cvo.state==4)
+    			    state="지각";
+    		else if(cvo.state==5) 
+    			     state="조퇴";
+    		else if(cvo.state=6)
+    			     state="지각&조퇴"
+    		document.getElementById("toHome").innerText=cvo.toHome+" ("+state+")";
+    		
+    		// 퇴근하기를 클릭하면 버튼 비활성화
+    		document.getElementById("h").disabled=true;
+    	}
+    	chk.open("get","toHome");
+    	chk.send();
+    }
+  </script>
+</head>
+<body>
+  <section layout:fragment="content">
+      <div id="top">
+         <input id="w" th:if="${cvo==null}" type="button" value="출근하기" onclick="toWork()">
+         <input id="w" th:unless="${cvo==null}" type="button" value="출근하기" disabled>
+         <input id="h" th:if="${ (cvo!=null) && cvo.state<=2}" type="button" value="퇴근하기" onclick="toHome()">
+         <input id="h" th:unless="${ (cvo!=null) && cvo.state<=2}" type="button" value="퇴근하기" onclick="toHome()" disabled>
+     </div>
+     <div id="toWork"> 
+       <span th:if="${cvo!=null}" th:text="${cvo.toWork+' '+state}"></span>
+     </div>
+     <div id="toHome">
+       <span th:if="${ cvo!=null && cvo.state>=3 }" th:text="${cvo.toHome+' '+state2}"></span>
+     </div>
+  </section>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.MiniMapper">
+   <select id="loginOk" resultType="Integer">
+     select level from sawon
+     where sabun=#{sabun} and pwd=#{pwd}
+   </select>
+   
+   <select id="list" resultType="com.example.demo.BoardVo">
+     select * from board
+     where grp=#{grp}
+     order by id desc
+     limit #{index},10
+   </select>
+   
+   <select id="getChong" resultType="Integer">
+     select ceil(count(*)/10) from board
+     where grp=#{grp}
+     
+   </select>
+   
+   <insert id="write" parameterType="com.example.demo.BoardVo">
+     insert into board(title,content,sabun,grp,writeday)
+     values(#{title},#{content},#{sabun},#{grp},now())
+   </insert>
+   
+   <select id="content" resultType="com.example.demo.BoardVo">
+      select * from board
+      where id=#{id}
+   </select>
+   
+   <delete id="delete">
+      delete from board
+      where id=#{id}
+   </delete>
+   
+   <update id="updateOk" parameterType="com.example.demo.BoardVo">
+      update board
+      set title=#{title}, content=#{content}, grp=#{grp}
+      where id=#{id}
+   </update>
+   
+   <select id="sendMemo" resultType="com.example.demo.MemoVo">
+      select id, reSabun,title,fname,left(writeday,10) as writeday,state
+      from memo
+      where seSabun=#{sabun} and delState=0
+      order by id desc
+      limit #{sindex},20
+   </select>
+   <select id="receiveMemo" resultType="com.example.demo.MemoVo">
+      select  id, seSabun,title,fname,left(writeday,10) as writeday,state 
+      from memo
+      where reSabun=#{sabun} and delState=0
+      order by id desc
+      limit #{rindex},20
+   </select>
+   
+   <select id="getSawon" resultType="com.example.demo.SawonVo">
+     select name, sabun
+     from sawon
+     where sabun like concat(#{depart},'%')
+     order by name asc
+   </select>
+   
+   <insert id="memoWriteOk" parameterType="com.example.demo.MemoVo">
+     insert into memo(seSabun,reSabun,title,content,fname,writeday)
+     value(#{seSabun},#{reSabun},#{title},#{content},#{fname},now())
+   </insert>
+   
+   <select id="getSchong" resultType="Integer">
+     select ceil(count(*)/20) from memo
+     where seSabun=#{sabun}
+   </select>
+   <select id="getRchong" resultType="Integer">
+     select ceil(count(*)/20) from memo
+     where reSabun=#{sabun}
+   </select>
+   
+   <select id="viewSMemo" resultType="com.example.demo.MemoVo">
+     select * from memo
+     where id=#{id}
+   </select>
+   
+   <update id="setState">
+     update memo 
+     set state=1
+     where id=#{id}
+   </update>
+   
+   <update id="setDelState">
+     update memo
+     set delState=1
+     where id=#{id}
+   </update>
+   
+   <insert id="toWork">
+    <![CDATA[
+     insert into commute(sabun,toWork,writeday,state)
+     values(#{sabun},now(),curdate(), if( curtime()<='09:00:00' , 1 , 2)  )
+    ]]>
+   </insert>
+   
+   <select id="getCommState" resultType="com.example.demo.CommuteVo">
+     select * from commute
+     where sabun=#{sabun} and writeday=#{today}
+   </select>
+   
+   <select id="getToWork" resultType="com.example.demo.CommuteVo">
+     select * from commute
+     where sabun=#{sabun} and writeday=#{today}
+   </select>
+    
+   <update id="toHome">
+    <![CDATA[
+      update commute
+      set toHome=now() ,
+      state= if( (state=1 and curtime() >= '18:00:00') , 3 , 
+             if( (state=1 and curtime() < '18:00:00')  , 5 , 
+             if( (state=2 and curtime() >= '18:00:00') , 4 , 
+             if( (state=2 and curtime() < '18:00:00')  , 6 , 100)  )))
+      where sabun=#{sabun} and writeday=curdate()       
+      
+    ]]>
+   </update>
+   
+   <select id="sawonList" resultType="com.example.demo.SawonVo">
+      select * from sawon
+      where sabun like concat(#{depart},'%');
+   </select>
+   
+   <select id="getBunho" resultType="Integer">
+     select ifnull( max(right(sabun,3)) , 0)+1  from sawon
+     where sabun like concat(#{depart},'%')
+   </select>
+   
+   <insert id="sawonChugaOk" parameterType="com.example.demo.SawonVo">
+      insert into sawon(sabun,name,pwd,phone,email,ipsa,level,writeday)
+      values(#{sabun},#{name},'1234',#{phone},#{email},#{ipsa},#{level},now())
+   </insert>
+   
+   <delete id="sawonDel">
+      delete from sawon
+      where id=#{id}
+   </delete>
+   
+   <select id="sawonUpdate" resultType="com.example.demo.SawonVo">
+      select * from sawon
+      where id=#{id}
+   </select>
+   
+   <select id="sawonUpdateOk" parameterType="com.example.demo.SawonVo">
+      update sawon
+      set sabun=#{sabun}, name=#{name},
+      level=#{level}, ipsa=#{ipsa},
+      phone=#{phone},email=#{email}
+      where id=#{id}
+   </select>
+</mapper>
+
+
+
+
+
+
+
+

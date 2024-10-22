@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <style>
+   header {
+     width:1000px;
+     height:50px;
+     margin:auto;
+   }
+   nav {
+     width:1000px;
+     height:60px;
+     margin:auto;
+     position:relative;
+     z-index:100;
+   }
+   nav a {
+     text-decoration:none;
+     color:green;
+   }
+   nav > ul {
+     padding-left:0px;
+   }
+   nav > ul > li {
+     list-style-type:none;
+     display:inline-block;
+     width:130px;
+     height:40px;
+     border:1px solid green;
+     text-align:center;
+     line-height:40px;
+     margin-left:60px;
+     position:relative;
+   }
+   nav > ul > li:last-child {
+     /* width:80px; */
+   }
+   
+   nav > ul > li > #grp { /* ul태그 : 게시판 */
+     padding-left:0px;
+     position:absolute;
+     left:-1px;
+     top:40px;
+     visibility:hidden;
+     }
+   nav > ul > li > #grp > li {
+     list-style-type:none;
+     width:130px;
+     height:40px;
+     border:1px solid green;
+     text-align:center;
+     line-height:40px;
+     background:white;
+     border-bottom:none;
+   }
+   nav > ul > li > #grp > li:last-child {
+     border-bottom:1px solid green;
+   }
+   nav > ul > li > #sawonSelect {  /* 사원관리 ul태그 */
+     padding-left:0px;
+     position:absolute;
+     left:-1px;
+     top:40px;
+     visibility:hidden;
+   } 
+   nav > ul > li > #sawonSelect > li {
+     list-style-type:none;
+     width:130px;
+     height:40px;
+     border:1px solid green;
+     text-align:center;
+     line-height:40px;
+     background:white;
+     border-bottom:none;
+   }
+   nav > ul > li > #sawonSelect > li:last-child {
+     border-bottom:1px solid green;
+   }
+   footer {
+     width:1000px;
+     height:100px;
+     margin:auto;
+   }
+ </style>
+ <script>
+   function viewMenu(n)
+   {
+	   document.getElementsByClassName("subMenu")[n].style.visibility="visible";
+   }
+   function hideMenu(n)
+   {
+	   document.getElementsByClassName("subMenu")[n].style.visibility="hidden";
+   }
+ </script>
+</head>
+<body> <!-- default.html -->
+  <header> 기본 내용 </header>
+  <nav>
+    <ul>
+      <li onmouseover="viewMenu(0)" onmouseout="hideMenu(0)"> 사원관리 
+        <ul class="subMenu" id="sawonSelect">
+        
+          <li th:if="${ session.level==100  || ( session.depart=='총무부' && session.level>=50 ) }">
+            <a href="sawonList?depart=s01"> 총무부 </a> 
+          </li> <!-- level:100  , 해당부서&&level >=50 -->
+          
+          <li th:if="${ session.level==100  || ( session.depart=='자재부' && session.level>=50 ) }"> 
+            <a href="sawonList?depart=s02"> 자재부 </a> 
+          </li>
+          
+          <li th:if="${ session.level==100  || ( session.depart=='영업부' && session.level>=50 ) }"> 
+            <a href="sawonList?depart=s03"> 영업부 </a>  
+          </li>
+          
+          <li th:if="${ session.level==100  || ( session.depart=='감사부' && session.level>=50 ) }">
+            <a href="sawonList?depart=s04"> 감사부 </a>  
+          </li>
+          
+        </ul>
+        
+      </li>
+      
+      
+      <li onmouseover="viewMenu(1)" onmouseout="hideMenu(1)"> 부서게시판 
+        <ul class="subMenu" id="grp">
+         <!-- 총무부사원 , 최고관리자 --> 
+          <li th:if="${ session.depart=='총무부' || session.level==100  }"> <a href="list?grp=1">총무부</a> </li>
+          <li th:if="${ session.depart=='자재부' || session.level==100  }"> <a href="list?grp=2">자재부</a> </li>
+          <li th:if="${ session.depart=='영업부' || session.level==100  }"> <a href="list?grp=3">영업무</a> </li>
+          <li th:if="${ session.depart=='감사부' || session.level==100  }"> <a href="list?grp=4">감사부</a> </li>
+          <li> <a href="list?grp=0"> 전체게시판 </a></li> 
+        </ul>
+      </li>
+      <li> <a href="commute"> 출퇴근관리 </a></li> 
+      <li> <a href="myMemo"> 메모관리 </a></li>
+      
+     <th:block th:if="${session.sabun!=null}">
+      <li> 
+         <span th:text="${session.sabun}"></span>
+         <a href="logout"> Logout </a> 
+      </li>
+     </th:block>
+    </ul>
+  </nav>
+  <section layout:fragment="content"></section>
+  <footer></footer>
+</body>
+</html>

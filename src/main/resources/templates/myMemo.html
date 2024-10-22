@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+  <style>
+    section {
+      width:1000px;
+      height:600px;
+      margin:auto;
+      position:relative;
+    }
+    section #delBtn {
+      font-size:10px;
+      background:green;
+      color:white;
+      border:none;
+    }
+    section #memo {
+      position:absolute;
+      top:100px;
+      left:400px;
+      width:200px;
+      height:250px;
+      border:1px solid green;
+      background:white;
+      visibility:hidden;  
+    }
+    section #memo #ff {
+      text-align:right;
+      height:auto;
+      font-size:12px;
+      margin-top:2px;
+      color:#333;
+      border-radius: 4px;
+      padding: 5px;
+ 
+    }
+    section #memo #ff span:hover {
+      background-color: #007bff;  
+      color: white;
+      border-color: #0056b3;  
+    }
+    section #memo #ff span {
+      border:1px solid green;
+      padding:2px 6px;
+      border-radius: 3px;
+      cursor:pointer;
+      transition: background-color 0.3s, border-color 0.3s;
+      font-weight:900;
+    }
+    section #memo div {
+      margin-top:10px;
+      text-align:center;
+    }
+    section #memo select {
+      width:95px;
+      height:24px;
+    }
+    section #memo input[type=text] {
+      width:190px;
+      height:24px;
+    }
+    section #memo textarea {
+      width:190px;
+      height:50px;
+    }
+    section #memo input[type=submit] {
+      width:198px;
+      height:28px;
+    }
+    
+    section #title {
+      border:none;
+      padding:0px;
+    }
+    section #left {
+      width:496px;
+      height:560px;
+      float:left;
+      border:1px solid green;
+      font-size:12px;
+      position:relative;
+    }
+ 
+    section #left #viewSendMemo {
+      position:absolute;
+      left:148px;
+      top:100px;
+      width:200px;
+      height:283px;
+      border:2px solid green;
+      background:white;
+      text-align:center;
+      visibility:hidden;
+    }
+    section #left #viewSendMemo a {
+      border:none;
+    }
+    section #left #viewSendMemo div{
+      margin-top:20px;
+      border-bottom:1px solid green;
+      text-align:center;
+    }
+    section #left #viewSendMemo div:nth-child(3) {
+      height:100px;
+    }
+    
+    section #right {
+      width:496px;
+      height:560px;
+      float:left;
+      border:1px solid green;
+      font-size:12px;
+      position:relative;
+    }
+    section #right #viewReceiveMemo {
+      position:absolute;
+      left:148px;
+      top:100px;
+      width:200px;
+      height:283px;
+      border:2px solid green;
+      background:white;
+      visibility:hidden;
+    }
+    section #right #viewReceiveMemo a {
+      border:none;
+    }
+    section #right #viewReceiveMemo div{
+      margin-top:20px;
+      border-bottom:1px solid green;
+      text-align:center;
+    }
+    section #right #viewReceiveMemo div:nth-child(3) {
+      height:100px;
+    }
+    section #bottom {
+      clear:both;
+      width:1000px;
+      height:40px;
+      line-height:40px;
+    }
+    section a {
+      text-decoration:none;
+      color:black;
+     padding:6px 12px;
+      border:1px solid black; 
+      font-size:12px;
+    }
+    section table a {
+     padding:2px 4px;
+    }
+    section #fff {
+       font-weight:900;
+       margin-right:-2px;
+    }
+    section #xx {
+      border:2px solid green;
+      padding: 0px 3px;
+    }
+  </style>
+  <script>
+    function getSawon(depart)
+    {
+    	if(depart=="")
+    	{
+    		 
+    		document.getElementById("reSabun2").options.length=0;
+    	}	
+    	else
+    	{
+ 
+    		var chk=new XMLHttpRequest();
+        	chk.onload=function()
+        	{
+        		//alert(chk.responseText);
+                var slist=JSON.parse(chk.responseText); 
+                
+                //alert(slist.length);
+                /*
+        		var str="";
+        		for(svo of slist) // 1명당 하나의 option태그
+        	    {
+        	        str=str+"<option value='"+svo.sabun+"'>"+svo.name+"</option>";
+        		}
+        		document.getElementById("reSabun2").innerHTML=str;
+        		*/
+        		// options를 이용하기
+        		//alert(slist.length);
+        		document.getElementById("reSabun2").options.length=slist.length;
+        		var n=0;
+        		for(svo of slist) // 1명당 하나의 option태그
+        	    {
+        			document.getElementById("reSabun2").options[n].value=svo.sabun;
+        			document.getElementById("reSabun2").options[n].text=svo.name;
+        			n++;
+        		}
+        		
+        	}
+        	chk.open("get","getSawon?depart="+depart);
+        	chk.send();
+    	}	
+    	
+    	
+    }
+    function memoView()
+    {
+    	document.getElementById("memo").style.visibility="visible";
+    }
+    function memoHide()
+    {
+    	document.getElementById("memo").style.visibility="hidden";
+    }
+    
+    function check(form)
+    {
+    	if(form.reSabun.value=="")
+        {
+    		alert("받는 사람을 선택하세요");
+    		return false;
+        }
+    	else if(form.title.value.trim()=="")
+    		 {
+    		     alert("제목을 입력하세요");
+    		     return false;
+    		 }
+    	     else if(form.content.value.trim()=="")
+    	          {
+    	    	     alert("내용을 적으세요");
+    	    	     return false;
+    	          }
+    	          else
+    	             return true;
+    }
+    
+    function viewSMemo(id)
+    {
+    	
+    	var chk=new XMLHttpRequest();
+    	chk.onload=function()
+    	{
+    		var mvo=JSON.parse(chk.responseText);
+    		
+    	    document.getElementById("reSabun").innerText=mvo.reSabun;
+    	    document.getElementById("title").innerText=mvo.title;
+    	    document.getElementById("content").innerHTML=mvo.content;
+    	    document.getElementById("writeday").innerText=mvo.writeday;
+    	    
+    	    document.getElementById("viewSendMemo").style.visibility="visible";
+    	    
+    	    document.getElementById("fname").innerText=mvo.fname;
+            document.getElementById("fname").setAttribute("href","down?fname="+mvo.fname);                                                                   
+    	    document.getElementById("size").innerText=mvo.size;
+    	}
+    	chk.open("get","viewSMemo?id="+id);
+    	chk.send();
+    }
+    function hideSendMemo()//(my)
+    {
+    	//my.style.visibility="hidden";
+    	document.getElementById("viewSendMemo").style.visibility="hidden";
+    }
+    function hideReceiveMemo()//(my)
+    {
+    	//my.style.visibility="hidden";
+    	document.getElementById("viewReceiveMemo").style.visibility="hidden";
+    	location.reload();
+    }
+    
+    function viewRMemo(id) // 받은메시지 보기
+    {
+    	var chk=new XMLHttpRequest();
+    	chk.onload=function()
+    	{
+    	  		
+    		var mvo=JSON.parse(chk.responseText);
+    		
+    	    document.getElementById("seSabun").innerText=mvo.seSabun;
+    	    document.getElementById("title2").innerText=mvo.title;
+    	    document.getElementById("content2").innerHTML=mvo.content;
+    	    document.getElementById("writeday2").innerText=mvo.writeday;
+    	    document.getElementById("fname2").innerText=mvo.fname;
+    	    //document.getElementById("fname2").setAttribute("onclick","down('"+mvo.fname+"')");
+    	                                                             // down('파일명')
+            document.getElementById("fname2").setAttribute("href","down?fname="+mvo.fname);                                                                   
+    	    document.getElementById("size2").innerText=mvo.size;
+    	    
+    	    document.getElementById("viewReceiveMemo").style.visibility="visible";
+    	}
+    	chk.open("get","viewRMemo?id="+id);
+    	chk.send();
+    }
+ 
+    
+    
+    function receiveDel()
+    {
+    	var rchk=document.getElementsByClassName("rchk");
+    	var len=rchk.length;
+    	var delId=""; // 삭제할 id를 저장할 변수
+    	for(i=0;i<len;i++)
+    	{
+    		if(rchk[i].checked)
+    		   delId=delId+rchk[i].value+",";
+    	}	
+    	
+    	document.rform.ids.value=delId; //  33,44,432,
+    	document.rform.submit();
+    }
+    
+    function sendDel()
+    {
+    	var schk=document.getElementsByClassName("schk");
+    	
+    	var len=schk.length;
+    	var delId=""; // 삭제할 id를 저장할 변수
+    	for(i=0;i<len;i++)
+    	{
+    		if(schk[i].checked)
+    		   delId=delId+schk[i].value+",";
+    	}	
+    	
+    	document.sform.ids.value=delId; //  33,44,432,
+    	document.sform.submit();
+    	//alert(delId);
+    }
+  </script>
+</head>
+<body>
+  <section layout:fragment="content">
+   
+    <div id="left">
+      <form name="sform" method="post" action="sendDel">
+        <input type="hidden" name="ids">
+        <input type="hidden" name="spage" th:value="${spage}">
+        <input type="hidden" name="rpage" th:value="${rpage}">
+      </form>
+      <div id="viewSendMemo">
+        <div id="fff"  style="text-align:right;margin-top:0px;border:none;"><span onclick="hideSendMemo()" id="xx">X</span></div>
+        <div> 받는사람 : <span id="reSabun"></span></div>
+        <div> <span id="title"></span> </div>
+        <div> <span id="content"></span> </div>
+        <div> <span id="writeday"></span> </div>
+        <div> <a id="fname"></a> <span id="size"></span></div>      
+      </div>
+      <table width="500" align="center">
+        <tr align="center">
+          <td width="30"> <input type="button" value="삭제" id="delBtn" onclick="sendDel()"> </td>
+          <td width="90"> 받는사람 </td>
+          <td> 제 목 </td>
+          <td width="40"> 읽음 </td>
+          <td width="90"> 전송일 </td>
+        </tr>
+        <tr th:each="mvo:${mlist1}">
+          <td align="center"> 
+            <input th:if="${mvo.state==0}" type="checkbox" class="schk" th:value="${mvo.id}">
+            <input th:unless="${mvo.state==0}"type="checkbox" class="schk" th:value="${mvo.id}" disabled> 
+          </td>
+          <td th:text="${mvo.reSabun}" align="center"></td>
+          <td> <a th:text="${mvo.title}" th:onclick="viewSMemo([[${mvo.id}]])" id="title"></a> </td>
+          <td align="center"> 
+            <span th:if="${mvo.state==0}" th:text="X"></span>
+            <span th:if="${mvo.state==1}" th:text="O"></span>
+          </td>
+          <td th:text="${mvo.writeday}" align="center"></td>
+        </tr>
+        <tr height="40"> <!--s 보낸 메모 페이징 출력 -->
+          <td colspan="3" align="center">
+          
+            <a th:if="${spage!=1}" th:href="@{myMemo(spage=${spage-1},rpage=${rpage})}"> prev </a>
+            <a th:unless="${spage!=1}" style="background:#eeeeee"> prev </a>
+            &nbsp;
+            <th:block th:each="i:${#numbers.sequence(spstart,spend)}">
+              <a th:text="${i}" th:if="${spage==i}" style="color:red" th:href="@{myMemo(spage=${i}, rpage=${rpage})}"></a>
+              <a th:text="${i}" th:unless="${spage==i}" th:href="@{myMemo(spage=${i}, rpage=${rpage})}"></a>
+            </th:block>
+            &nbsp;
+            <a th:if="${spage!=schong}" th:href="@{myMemo(spage=${spage+1},rpage=${rpage})}"> next </a>
+            <a th:unless="${spage!=schong}" style="background:#eeeeee"> next </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="right">
+      <form name="rform" method="post" action="receiveDel">
+        <input type="hidden" name="ids">
+        <input type="hidden" name="spage" th:value="${spage}">
+        <input type="hidden" name="rpage" th:value="${rpage}">
+      </form>
+      <div id="viewReceiveMemo">
+        <div id="fff" style="text-align:right;margin-top:0px;border:none;"><span onclick="hideReceiveMemo()" id="xx">X</span></div>
+        <div> 보낸사람 : <span id="seSabun"></span></div>
+        <div> <span id="title2"></span> </div>
+        <div> <span id="content2"></span> </div>
+        <div> <span id="writeday2"></span> </div>
+        <div> <a id="fname2"></a> <span id="size2"></span></div>  
+      </div>
+      <table width="500" align="center">
+        <tr align="center">
+          <td width="30"> <input type="button" value="삭제" id="delBtn" th:onclick="receiveDel()">  </td>
+          <td width="90"> 보낸사람 </td>
+          <td> 제 목 </td>
+          <td> 읽 음 </td>
+          <td width="90"> 전송일 </td>
+        </tr>
+        <tr th:each="mvo:${mlist2}">
+          <td align="center"> <input type="checkbox" class="rchk" th:value="${mvo.id}"> </td>
+          <td th:text="${mvo.seSabun}" align="center"></td>
+          <td> <a th:text="${mvo.title}" th:onclick="viewRMemo([[${mvo.id}]])" id="title"></a> </td>
+          <td align="center"> 
+            <span th:if="${mvo.state==0}" th:text="X"></span>
+            <span th:if="${mvo.state==1}" th:text="O"></span>
+          </td>
+          <td th:text="${mvo.writeday}" align="center"></td>
+        </tr>
+        <tr height="40"> <!--r 받은메모 페이징출력 -->
+          <td colspan="3" align="center">
+          
+           <a th:if="${rpage!=1}" th:href="@{myMemo(rpage=${rpage-1},spage=${spage})}"> prev </a>
+           <a th:unless="${rpage!=1}" style="background:#eeeeee"> prev </a>
+            &nbsp;
+            
+           <th:block th:each="i:${#numbers.sequence(rpstart,rpend)}">
+              <a th:text="${i}" th:if="${rpage==i}" style="color:red;" th:href="@{myMemo(spage=${spage}, rpage=${i})}"></a>
+              <a th:text="${i}" th:unless="${rpage==i}" th:href="@{myMemo(spage=${spage}, rpage=${i})}"></a>
+            </th:block>
+            
+            &nbsp;
+            <a th:if="${rpage!=rchong}" th:href="@{myMemo(rpage=${rpage+1},spage=${spage})}"> next </a>
+            <a th:unless="${rpage!=rchong}" style="background:#eeeeee"> next </a>
+            
+           </td>
+        </tr>
+      </table>
+    </div>
+    <div id="bottom" align="center">
+      <a href="javascript:memoView()"> 메모보내기 </a>
+    </div>
+    
+    <!-- 메모쓰기 폼 -->
+    <div id="memo">
+      <form method="post" action="memoWriteOk" enctype="multipart/form-data" onsubmit="return check(this)">
+           <!-- 받는 사람 -->
+           <div id="ff">
+             <span onclick="memoHide()">X</span>
+           </div>
+		   <div>
+		    <select name="depart" onchange="getSawon(this.value)">
+		      <option value=""> 부서 선택 </option>
+		      <option value="s01"> 총무부 </option>
+		      <option value="s02"> 자재부 </option>
+		      <option value="s03"> 영업부 </option>
+		      <option value="s04"> 감사부 </option>
+		    </select>
+		    <select name="reSabun" id="reSabun2"></select>
+		   </div>
+		   <!-- 제목 -->
+		   <div> <input type="text" name="title" placeholder="메모 제목"> </div>
+		   <div> <textarea name="content"></textarea> </div>
+		   <div> <input type="file" name="fname2"> </div>
+		   <div> <input type="submit" value="메모보내기"> </div>
+	  </form>
+	</div>
+    
+  </section>
+</body>
+</html>
+
+
+
+
+

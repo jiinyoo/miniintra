@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <style>
+   section {
+     width:1000px;
+     height:600px;
+     margin:auto;
+   }
+   section table {
+     border-spacing:0px;
+   }
+   section table tr td {
+     height:50px;
+     border-bottom:1px solid #dddddd;
+   }
+   section table tr:first-child td {
+     border-top:2px solid #dddddd;
+   }
+   section table tr:last-child td {
+     border-bottom:2px solid  #dddddd;
+   }
+   section table a {
+     text-decoration:none;
+     color:black;
+     border:1px solid black;
+     padding:4px 20px;
+     margin-left:10px;
+   }
+  </style>
+</head>
+<body> <!-- content.html -->
+ <section layout:fragment="content">
+  <table width="800" align="center">
+    <caption> <h2> 내용 보기 </h2></caption>
+    <tr>
+      <td> 제 목 </td>
+      <td th:text="${bvo.title}"></td>
+    </tr>
+    <tr>
+      <td> 작성자 </td>
+      <td th:text="${bvo.sabun}"></td>
+    </tr>
+     <tr>
+      <td> 작성일 </td>
+      <td th:text="${bvo.writeday}"></td>
+    </tr>
+    <tr height="300">
+      <td> 내 용 </td>
+      <td th:utext="${bvo.content}"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center">
+        <a th:href="@{list(page=${page},grp=${grp})}"> 목록 </a>
+       <th:block th:if="${bvo.sabun==session.sabun}">
+        <a th:href="@{update(id=${bvo.id},page=${page},grp=${grp})}"> 수정 </a>
+       </th:block>
+       <th:block th:if="${bvo.sabun==session.sabun || session.level==100}">
+        <a th:href="@{delete(id=${bvo.id},page=${page},grp=${grp})}"> 삭제 </a>
+       </th:block>       
+      </td>
+    </tr>
+  </table>
+</section>
+</body>
+</html>
+
+
+

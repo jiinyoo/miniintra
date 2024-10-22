@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+  <style>
+   section {
+    width:1000px;
+    height:600px;
+    margin:auto;
+   }
+   section a {
+     text-decoration:none;
+     color:green;
+   }
+ 
+   section table {
+     border-spacing:0px;
+   }
+   section table tr td {
+     border-bottom:1px solid green;
+     height:33px;
+   }
+   section table tr:first-child td {
+     border-top:2px solid green;
+     text-align:center;
+     font-weight:900;
+   }
+   section table tr:last-child td {
+     border-bottom:2px solid green;
+   }
+  </style>
+</head>
+<body> <!-- list.html -->
+  <section layout:fragment="content">
+      <table width="800" align="center">
+        <caption> <h2> <span th:text="${part}+' 게시판'"></span></h2></caption>
+        
+        <tr>
+          <td> 제 목 </td>
+          <td width="80"> 작성자 </td>
+          <td width="180"> 작성일 </td>
+        </tr>
+        <tr th:each="bvo:${blist}">
+          <td> <a th:href="@{content(id=${bvo.id},page=${page},grp=${grp})}" th:text="${bvo.title}"></a></td>
+          <td th:text="${bvo.sabun}" align="center"></td>
+          <td th:text="${bvo.writeday}" align="center"></td>
+        </tr>
+        <tr>
+      <td colspan="4" align="center">
+        
+        <a th:if="${pstart!=1}" th:href="@{list(page=${pstart-1},grp=${grp})}"> 이전그룹 </a>
+        <a th:unless="${pstart!=1}" > 이전그룹 </a>
+        
+        <a th:if="${page!=1}" th:href="@{list(page=${page-1},grp=${grp})}"> prev </a>
+        <a th:unless="${page!=1}"> prev </a>
+      
+        <th:block th:each="i:${#numbers.sequence(pstart,pend)}">
+         <a th:if="${page!=i}" th:href="@{list(page=${i},grp=${grp})}" th:text="${i}"></a>
+         <a th:unless="${page!=i}" th:href="@{list(page=${i},grp=${grp})}" th:text="${i}" id="aa"></a>
+        </th:block>
+      
+        <a th:if="${page!=chong}" th:href="@{list(page=${page+1},grp=${grp})}"> next </a>
+        <a th:unless="${page!=chong}"> next </a>
+        
+        <a th:if="${pend!=chong}" th:href="@{list(page=${pend+1},grp=${grp})}"> 다음그룹 </a>
+        <a th:unless="${pend!=chong}"> 다음그룹 </a>
+      
+      </td>
+    </tr>
+        
+        <tr>
+          <td colspan="4" align="right"> <a href="write"> 글쓰기 </a></td>
+        </tr>
+      </table>
+  </section>
+</body>
+</html>

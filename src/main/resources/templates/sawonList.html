@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <style>
+   section {
+     width:1000px;
+     height:600px;
+     margin:auto;
+     position:relative;
+   }
+   
+   section table {
+     border-spacing:0px; /* 셀과 셀 간격 == cellspacing */
+     margin-bottom:200px;
+   }
+   section table td {
+     border-bottom:1px solid green;
+     padding:5px;
+     height:35px;
+   }
+   section table tr:first-child td {
+     border-top:2px solid green;
+     border-bottom:2px solid green;
+   }
+   section table tr:last-child td {
+     border-bottom:2px solid green;
+   }
+   section #sawonChuga {
+     position:absolute;
+     width:200px;
+     height:224px;
+     border:2px solid green;
+     left:400px;
+     top:100px;
+     background:white;
+     visibility:hidden; 
+   }
+   section #sawonChuga div {
+     text-align:center;
+     margin-top:4px;
+   }
+   section select {
+     width:96px;
+     height:24px;
+   }
+   section input[type=text] {
+     width:190px;
+     height:20px;
+   }
+   section input[type=submit] {
+     width:198px;
+     height:24px;
+     background:green;
+     color:white;
+     border:1px solid green;
+   }
+   section .select {
+     width:62px;
+   }
+   section a {
+     text-decoration:none;
+     color:black;
+   }
+   section #sawonUpdate {
+     position:absolute;
+     width:200px;
+     height:224px;
+     border:2px solid green;
+     left:400px;
+     top:100px;
+     background:white;
+     visibility:hidden; 
+   }
+   section #sawonUpdate div {
+     text-align:center;
+     margin-top:4px;
+   }
+ </style>
+ <script>
+   function dayCal()
+   {
+	   var year=document.getElementById("year").value;
+	   var month=document.getElementById("month").value; // 1~12의 값이 전달
+	   // 년,월을 이용하여 총일수를 구하기
+	   
+	   var mon=[31,28,31,30,31,30,31,31,30,31,30,31];
+	   
+	   var chong=mon[month-1];
+	   
+	   // 윤년 2월일 경우 1이 증가
+	   if( (year%4==0 && year%100!=0) || year%400==0 )//(윤년인가)
+		   if(month==2)
+		      chong++;
+	   
+	   //alert(chong);
+	   
+	   // chong값을 이용하여 id="day"인 select태그에 option태그를 추가하기
+	   // 1. option태그를 직접 만들기
+	   /*
+	   var str="";
+	   for(i=1;i<=chong;i++)
+	   {
+		   str=str+"<option value="+i+"> "+i+" </option>";
+	   }	   
+	   document.getElementById("day").innerHTML=str;
+	   */
+	   // 2. options의 속성을 이용하기 (length, value , text)
+	   var day=document.getElementById("day");
+	   day.options.length=chong;
+	   for(i=0;i<chong;i++)
+	   {
+		   day.options[i].value=i+1;
+		   day.options[i].text=i+1;
+	   }	   
+   }
+   
+   function check()
+   {
+	   var y=document.getElementById("year").value;
+	   var m=document.getElementById("month").value;
+	   var d=document.getElementById("day").value;
+	   var ymd=y+"-"+m+"-"+d;
+	   document.getElementById("ipsa").value=ymd;
+	   
+	   return true;
+   }
+   function sawonChuga()
+   {
+	   document.getElementById("sawonChuga").style.visibility="visible";
+   }
+   function sawonDel(id,sabun)
+   {
+	  // alert(sabun);
+	   
+	   if(confirm("정말 "+sabun+" 사원을 삭제하시겠습니까?"))
+	   {
+		   location="sawonDel?id="+id+"&sabun="+sabun;
+	   }
+   }
+   function sawonUpdate(id)
+   {
+	   // 사원 수정하기 폼을 보이기
+	   document.getElementById("sawonUpdate").style.visibility="visible";
+	   
+	   var chk=new XMLHttpRequest();
+	   chk.onload=function()
+	   {
+		   //alert(chk.responseText);
+		   var svo=JSON.parse(chk.responseText);
+		   
+		   // 폼태그에 전달
+		   document.uform.id.value=svo.id;
+		   document.uform.sabun.value=svo.sabun;
+		   document.uform.year.value=svo.y;
+		   document.uform.month.value=svo.m;
+		   document.uform.day.value=svo.d;
+		   document.uform.depart.value=svo.depart;
+		   document.uform.level.value=svo.level;
+		   document.uform.name.value=svo.name;
+		   document.uform.phone.value=svo.phone;
+		   document.uform.email.value=svo.email;
+	   }
+	   chk.open("get","sawonUpdate?id="+id);
+	   chk.send();
+   }
+   
+   function check2()
+   {
+	   var y=document.uform.year.value;
+	   var m=document.uform.month.value;
+	   var d=document.uform.day.value;
+	   var ymd=y+"-"+m+"-"+d;
+	   document.getElementById("ipsa2").value=ymd;
+	   
+	   return true;
+   }
+ </script>
+</head>
+<body>
+  <section layout:fragment="content">
+    <table width="800" align="center">
+      <caption> <h3> [[${part}]] 명단 </h3></caption>
+      <tr align="center">
+        <td> 사원번호 </td>
+        <td> 이 름 </td>
+        <td> 전화번호 </td>
+        <td> 이메일 </td>
+        <td> 입사일 </td>
+        <td> 등 급 </td>
+      </tr>
+      <tr th:each="svo:${slist}" align="center">
+       <!-- 삭제는 사원번호를 클릭하기 -->
+        <td th:if="${false}"> <a th:text="${svo.sabun}" th:href="@{sawonDel(id=${svo.id},sabun=${svo.sabun})}"></a> </td>
+        <td> <a th:text="${svo.sabun}" th:onclick="sawonDel([[${svo.id}]],'[(${svo.sabun})]')"></a>  </td>
+        <td th:text="${svo.name}" th:onclick="sawonUpdate([[${svo.id}]])"></td>
+        <td th:text="${svo.phone}"></td>
+        <td th:text="${svo.email}"></td>
+        <td th:text="${svo.ipsa}"></td>
+        <td th:text="${svo.level}"></td>
+      </tr>
+      <tr th:if="${session.level >= 70}">
+        <td colspan="6" align="right">
+          <a href="javascript:sawonChuga()"> 사원 추가 </a>
+        </td>
+      </tr>
+    </table>
+    
+    <div id="sawonChuga">
+      <div id="sd" style="font-size:16px;font-weight:900"> 사원 등록 하기</div>
+      <form method="post" action="sawonChugaOk" onsubmit="return check()">
+       <input type="hidden" name="ipsa" id="ipsa"> <!-- YYYY-MM-DD -->
+      <div id="sabun">
+        <select name="depart">
+          <option value=""> 부서 선택 </option>
+          <option value="s01"> 총무부 </option>
+          <option value="s02"> 자재부 </option>
+          <option value="s03"> 영업부 </option>
+          <option value="s04"> 감사부 </option>
+        </select>
+        <select name="level">
+          <option value="10"> 일반사원 </option>
+          <option value="30"> 주 임 </option>
+          <option value="50"> 과 장 </option>
+          <option value="70"> 부 장 </option>
+        </select>
+      </div>
+      <div id="ipsa">
+        <div style="font-size:13px;font-weight:900"> 입사일 </div>
+        <select class="select" name="year" id="year">
+          <th:block th:each="i:${#numbers.sequence(2024,2000)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+        
+        <select class="select" name="month" id="month" onchange="dayCal()">
+          <th:block th:each="i:${#numbers.sequence(1,12)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+                
+        <select class="select" name="day" id="day">
+          <th:block th:each="i:${#numbers.sequence(1,31)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+        
+      </div>
+      <div id="name"> <input type="text" name="name" placeholder="이 름"></div>
+      <div id="phone"> <input type="text" name="phone" placeholder="전화번호"></div>
+      <div id="email"> <input type="text" name="email" placeholder="이메일"></div>
+      <div id="submit"> <input type="submit" value="사원 등록"> </div>
+     </form>
+    </div> <!-- id="sawonChuga"의 끝 -->
+   
+   <!-- 이름을 클릭하면 보이기 -->
+   <div id="sawonUpdate">
+      <div id="sd" style="font-size:16px;font-weight:900"> 사원 수정 하기</div>
+      <form name="uform" method="post" action="sawonUpdateOk" onsubmit="return check2()">
+       <input type="hidden" name="id">
+       <input type="hidden" name="ipsa" id="ipsa2"> <!-- YYYY-MM-DD -->
+       <!-- 부서가 바뀔것을 대비해서 원래 부서의 depart를 input태그로 저장하여 전달 -->
+       <input type="hidden" name="sabun"> <!-- 수정할 사원의 사원번호 -->
+      <div id="sabun">
+        <select name="depart">
+          <option value=""> 부서 선택 </option>
+          <option value="s01"> 총무부 </option>
+          <option value="s02"> 자재부 </option>
+          <option value="s03"> 영업부 </option>
+          <option value="s04"> 감사부 </option>
+        </select>
+        <select name="level">
+          <option value="10"> 일반사원 </option>
+          <option value="30"> 주 임 </option>
+          <option value="50"> 과 장 </option>
+          <option value="70"> 부 장 </option>
+        </select>
+      </div>
+      <div id="ipsa">
+        <div style="font-size:13px;font-weight:900"> 입사일 </div>
+        <select class="select" name="year">
+          <th:block th:each="i:${#numbers.sequence(2024,2000)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+        
+        <select class="select" name="month" onchange="dayCal()">
+          <th:block th:each="i:${#numbers.sequence(1,12)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+                
+        <select class="select" name="day" >
+          <th:block th:each="i:${#numbers.sequence(1,31)}">
+            <option th:value="${i}" th:text="${i}"> </option>
+          </th:block>
+        </select>
+        
+      </div>
+      <div id="name"> <input type="text" name="name" placeholder="이 름"></div>
+      <div id="phone"> <input type="text" name="phone" placeholder="전화번호"></div>
+      <div id="email"> <input type="text" name="email" placeholder="이메일"></div>
+      <div id="submit"> <input type="submit" value="사원 등록"> </div>
+     </form>
+    </div> <!-- id="sawonChuga"의 끝 -->
+   
+  </section>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="/default">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <style>
+   table {
+     border-spacing:0px;
+   }
+   table tr td {
+     height:50px;
+     border-bottom:1px solid #dddddd;
+   }
+   table tr:first-child td {
+     border-top:2px solid #dddddd;
+   }
+   table tr:last-child td {
+     border-bottom:2px solid  #dddddd;
+   }
+   input[type=text] {
+     width:500px;
+     height:30px;
+   }
+   input[type=password] {
+     width:180px;
+     height:30px;
+   }
+   input[type=submit] {
+     width:200px;
+     height:30px;
+   }
+   textarea {
+     width:500px;
+     height:200px;
+   }
+ </style>
+</head>
+<body> <!-- write.html -->
+ <section  layout:fragment="content">
+ <table width="700" align="center">
+  <caption> <h2> 글 쓰기 </h2></caption>
+ <form method="post" action="write"> <!-- 사번, 제목, 내용, grp -->
+    <tr>
+     <td> 제 목 </td>
+     <td> <input type="text" name="title"> </td>
+   </tr>
+   <tr>
+     <td> 내 용 </td>
+     <td> <textarea name="content"></textarea> </td>
+   </tr>
+   <tr>
+     <td colspan="2" align="center">
+       <input type="radio" name="grp" value="0">전체게시판
+       
+      <th:block th:if="${ session.depart=='총무부' || session.level==100 }">
+       <input type="radio" name="grp" value="1">총무부
+      </th:block>
+      
+      <th:block th:if="${ session.depart=='자재부' || session.level==100 }">
+       <input type="radio" name="grp" value="2">자재부
+      </th:block>
+      
+      <th:block th:if="${ session.depart=='영업부' || session.level==100 }">
+       <input type="radio" name="grp" value="3">영업부
+      </th:block>
+      
+      <th:block th:if="${ session.depart=='감사부' || session.level==100 }">
+       <input type="radio" name="grp" value="4">감사부
+      </th:block>
+     </td>
+   </tr>
+   <tr>
+     <td colspan="2" align="center">
+       <input type="submit" value="글쓰기">
+     </td>
+   </tr>
+ </form>
+ </table>
+</section>
+</body>
